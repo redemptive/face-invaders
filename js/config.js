@@ -17,9 +17,9 @@ window.gameConfig = {
 		moveStep: 10,
 		screenPadding: 10,
 		sprites: [
-			"assets/player2.png",
-			"assets/player1.png",
-			"assets/player.png"
+			"assets/skull.png",
+			"assets/imp.png",
+			"assets/smiling_imp.png"
 		]
 	},
 	playerLaser: {
@@ -29,7 +29,7 @@ window.gameConfig = {
 		id: 0,
 		className: "bullet"
 	},
-	aliens: {
+	enemies: {
 		initialNumber: 0,
 		perRow: 5,
 		direction: "right",
@@ -45,17 +45,17 @@ window.gameConfig = {
 		fireCooldown: 200,
 		fireCooldownScoreMultiplier: 4,
 		sprites: [
-			"assets/alien.png",
-			"assets/alien1.png",
-			"assets/alien2.png"
+			"assets/smile.png",
+			"assets/grin.png",
+			"assets/laughing.png"
 		]
 	},
-	alienLaser: {
+	enemyLaser: {
 		speedBase: 6,
 		height: 25,
 		width: 10,
 		id: 0,
-		className: "alienLaser"
+		className: "enemyLaser"
 	},
 	animation: {
 		counter: 0,

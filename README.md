@@ -18,4 +18,4 @@ Either clone the repository and open start.html to play or go to http://redempti
 - D key, move right
 - G key, fire laser
 
-Avoid the alien lasers and shoot all the aliens before they reach the bottom of the screen.
+Avoid the enemy lasers and shoot all the enemies before they reach the bottom of the screen.

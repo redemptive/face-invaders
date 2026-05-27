@@ -1,4 +1,4 @@
-.alien-img {
+.enemy-img {
 	max-width:100%;
 	max-height:100%;
 }
@@ -12,7 +12,7 @@
 	left: 0px;
 }
 
-.alienLaser {
+.enemyLaser {
 	background-color: #FF0000;
 	position: absolute;
 	top: 0px;
@@ -38,7 +38,7 @@ body {
 	animation: backgroundScroll 10s linear infinite;
 }
 
-.alien {
+.enemy {
 	position: fixed;
 }
 
