@@ -6,25 +6,41 @@ class Enemy {
 		this.height = height;
 		this.width = width;
 		this.sprite = sprite;
+		this.element = null;
+		this.imageElement = null;
 	}
 
-	buildHtml() {
-		//Build required HTML for the Enemy
-		return `<div id="${this.id}" class="enemy" style="height:${this.height}px; width: ${this.width}px; top: ${this.y}px;left: ${this.x}px;"><img src="${this.sprite}" class="enemy-img"></div>`;
+	buildElement() {
+		//Build required DOM for the Enemy
+		this.element = document.createElement("div");
+		this.element.id = this.id;
+		this.element.className = "enemy";
+		Object.assign(this.element.style, {
+			height: this.height + "px",
+			width: this.width + "px",
+			top: this.y + "px",
+			left: this.x + "px"
+		});
+
+		this.imageElement = document.createElement("img");
+		this.imageElement.src = this.sprite;
+		this.imageElement.className = "enemy-img";
+		this.element.appendChild(this.imageElement);
+
+		return this.element;
 	}
 
 	changeImage(sprite) {
 		//Change this enemies sprite to the passed in sprite
 		this.sprite = sprite;
-		const image = window.gameDom.getEnemyElement(this.id).querySelector("img");
-		image.setAttribute("src", this.sprite);
+		this.imageElement.src = this.sprite;
 	}
 
 	move(xMove, yMove) {
 		//Move the enemy by the provided coordinates
 		this.x += xMove;
 		this.y += yMove;
-		Object.assign(window.gameDom.getEnemyElement(this.id).style, {
+		Object.assign(this.element.style, {
 			top: this.y + "px",
 			left: this.x + "px"
 		});
@@ -32,7 +48,7 @@ class Enemy {
 
 	die() {
 		//Get rid of the enemy from the document
-		window.gameDom.getEnemyElement(this.id).remove();
+		this.element.remove();
 	}
 }
 

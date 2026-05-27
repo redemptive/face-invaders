@@ -16,6 +16,8 @@ class Game {
 		this.endGame = endGame;
 		this.keyMap = keyMap;
 		this.score = score;
+		this.scoreElement = null;
+		this.livesElement = null;
 		//function calls
 		this.spawnEnemies();
 		this.initScreen();
@@ -24,15 +26,23 @@ class Game {
 
 	initScreen() {
 		//Draw player, score and lives to the screen
-		window.gameDom.appendHtml(this.player.buildHtml());
-		window.gameDom.appendHtml(`<div id="score">Score: ${this.score}</div>`);
-		window.gameDom.appendHtml(`<div id="lives">Lives: ${this.player.lives}</div>`);
+		window.gameDom.appendElement(this.player.buildElement());
+
+		this.scoreElement = document.createElement("div");
+		this.scoreElement.id = "score";
+		this.scoreElement.textContent = `Score: ${this.score}`;
+		window.gameDom.appendElement(this.scoreElement);
+
+		this.livesElement = document.createElement("div");
+		this.livesElement.id = "lives";
+		this.livesElement.textContent = `Lives: ${this.player.lives}`;
+		window.gameDom.appendElement(this.livesElement);
 	}
 
 	updateHud() {
 		//Update score and lives when they change
-		window.gameDom.setText("#score", `Score: ${this.score}`);
-		window.gameDom.setText("#lives", `Lives: ${this.player.lives}`);
+		this.scoreElement.textContent = `Score: ${this.score}`;
+		this.livesElement.textContent = `Lives: ${this.player.lives}`;
 	}
 
 	spawnEnemies() {
@@ -60,7 +70,7 @@ class Game {
 					this.enemySprites[this.animateIndex]
 				);
 			}
-			window.gameDom.appendHtml(this.enemies[i].buildHtml());
+			window.gameDom.appendElement(this.enemies[i].buildElement());
 		}
 	}
 
@@ -82,7 +92,7 @@ class Game {
 				config.playerLaser.id,
 				config.playerLaser.className
 			);
-			window.gameDom.appendHtml(this.playerLaser.buildHtml());
+			window.gameDom.appendElement(this.playerLaser.buildElement());
 		}
 	}
 
@@ -178,7 +188,7 @@ class Game {
 				config.enemyLaser.id,
 				config.enemyLaser.className
 			);
-			window.gameDom.appendHtml(this.enemyLaser.buildHtml());
+			window.gameDom.appendElement(this.enemyLaser.buildElement());
 			this.enemyFireCounter = 0;
 		} else {
 			this.enemyFireCounter++;
@@ -217,8 +227,14 @@ class Game {
 		} else {
 			//Stop running game loop and display the score
 			clearInterval(this.interval);
-			document.body.innerHTML = "";
-			window.gameDom.appendHtml(`<div class="endGame"><h2>You died! Score: ${this.score}</h2></div>`);
+			document.body.replaceChildren();
+
+			const endGameElement = document.createElement("div");
+			endGameElement.className = "endGame";
+			const heading = document.createElement("h2");
+			heading.textContent = `You died! Score: ${this.score}`;
+			endGameElement.appendChild(heading);
+			window.gameDom.appendElement(endGameElement);
 		}
 	}
 }

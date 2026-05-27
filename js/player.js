@@ -6,26 +6,42 @@ class Player {
 		this.width = width;
 		this.lives = lives;
 		this.sprites = sprites;
+		this.element = null;
+		this.imageElement = null;
 	}
 
 	move(xMove, yMove) {
 		//Function for moving the player
 		this.x += xMove;
 		this.y += yMove;
-		window.gameDom.setStyles("#player", {
+		Object.assign(this.element.style, {
 			top: this.y + "px",
 			left: this.x + "px"
 		});
 	}
 
-	buildHtml() {
-		//Put together the required HTML for the player
-		return `<div id="player" style="top: ${this.y}px; left: ${this.x}px;"><img id="playerImg" src="${this.sprites[this.lives - 1]}" width="${this.width}" height="${this.height}"></div>`;
+	buildElement() {
+		//Put together the required DOM for the player
+		this.element = document.createElement("div");
+		this.element.id = "player";
+		Object.assign(this.element.style, {
+			top: this.y + "px",
+			left: this.x + "px"
+		});
+
+		this.imageElement = document.createElement("img");
+		this.imageElement.id = "playerImg";
+		this.imageElement.src = this.sprites[this.lives - 1];
+		this.imageElement.width = this.width;
+		this.imageElement.height = this.height;
+		this.element.appendChild(this.imageElement);
+
+		return this.element;
 	}
 
 	changeSprite() {
 		//Change the player sprite if the player has been shot and is damaged
-		document.querySelector("#playerImg").setAttribute("src", this.sprites[this.lives - 1]);
+		this.imageElement.src = this.sprites[this.lives - 1];
 	}
 }
 
