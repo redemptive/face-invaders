@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const removeAll = (selector) => {
 		document.querySelectorAll(selector).forEach((element) => element.remove());
 	};
-	const getAlienElement = (id) => document.querySelector(".alien[id=\"" + id + "\"]");
+	const getAlienElement = (id) => document.querySelector(`.alien[id="${id}"]`);
 	
 	class Game {
 		constructor(player, playerLaser, aliens, alienLaser, alienSprites, alienNumber, aliensPerRow, alienDirection, alienFireCounter, alienFireCooldown, animateCounter, animateIndex, animateSpeed, endGame, keyMap, score) {
@@ -46,8 +46,8 @@ document.addEventListener("DOMContentLoaded", () => {
 		initScreen() {
 			//Draw player, score and lives to the screen
 			appendHtml(this.player.buildHtml());
-			appendHtml("<div id=\"score\">Score: " + this.score + "</div>");
-			appendHtml("<div id=\"lives\">Lives: " + this.player.lives + "</div>");
+			appendHtml(`<div id="score">Score: ${this.score}</div>`);
+			appendHtml(`<div id="lives">Lives: ${this.player.lives}</div>`);
 		}
 
 		updateHud() {
@@ -84,8 +84,8 @@ document.addEventListener("DOMContentLoaded", () => {
 			}
 		}
 
-		collission(x1,y1,w1,h1,x2,y2,w2,h2) {
-			//Check for collissions (bounding box)
+		collision(x1,y1,w1,h1,x2,y2,w2,h2) {
+			//Check for collisions (bounding box)
 			const r1 = w1 + x1;
 			const b1 = h1 + y1;
 			const r2 = w2 + x2;
@@ -154,7 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
 				}
 				//Check if the player has shot an alien
 				if (this.playerLaser !== "") {
-					if (this.collission(this.aliens[i].x, this.aliens[i].y, this.aliens[i].width, this.aliens[i].height,this.playerLaser.x, this.playerLaser.y, this.playerLaser.width, this.playerLaser.height)) {
+					if (this.collision(this.aliens[i].x, this.aliens[i].y, this.aliens[i].width, this.aliens[i].height,this.playerLaser.x, this.playerLaser.y, this.playerLaser.width, this.playerLaser.height)) {
 						this.score ++;
 						this.updateHud();
 						this.aliens[i].die();
@@ -188,7 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
 				this.checkKeys();
 				this.manageAliens();
 				if (this.alienLaser !== "") {
-					if (this.collission(this.player.x, this.player.y, this.player.width, this.player.height, this.alienLaser.x, this.alienLaser.y, this.alienLaser.width, this.alienLaser.height)) {
+					if (this.collision(this.player.x, this.player.y, this.player.width, this.player.height, this.alienLaser.x, this.alienLaser.y, this.alienLaser.width, this.alienLaser.height)) {
 						this.alienLaser.die();
 						this.alienLaser = "";
 						this.player.lives --;
@@ -208,7 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
 				//Stop running game loop and display the score
 				clearInterval(this.interval);
 				document.body.innerHTML = "";
-				appendHtml("<div class=\"endGame\"><h2>You died! Score: " + this.score + "</h2></div>");
+				appendHtml(`<div class="endGame"><h2>You died! Score: ${this.score}</h2></div>`);
 			}
 		}
 	}
@@ -235,7 +235,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		buildHtml() {
 			//Put together the required HTML for the player
-			return "<div id=\"player\"><img id=\"playerImg\" src=\"" + this.sprites[this.lives - 1] + "\" width=\"" + this.width + "\" height=\"" + this.height + "\"></div>";
+			return `<div id="player"><img id="playerImg" src="${this.sprites[this.lives - 1]}" width="${this.width}" height="${this.height}"></div>`;
 		}
 
 		changeSprite() {
@@ -263,7 +263,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		buildHtml() {
 			//Build required HTML for the laser
-			return "<div id=\"" + this.id + "\" class=\""+ this.className + "\" style=\"height: " + this.height + "px; width: " + this.width + "px; top: " + this.y + "px;left: " + this.x + "px;\"></div>";
+			return `<div id="${this.id}" class="${this.className}" style="height: ${this.height}px; width: ${this.width}px; top: ${this.y}px;left: ${this.x}px;"></div>`;
 		}
 
 		die() {
@@ -284,7 +284,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		buildHtml() {
 			//Build required HTML for the Alien
-			return "<div id=\"" + this.id + "\" class=\"alien\" style=\"height:" + this.height + "px; width: " + this.width + "px; top: " + this.y + "px;left: " + this.x + "px;\"><img src=\"" + this.sprite + "\" class=\"alien-img\"></div>";
+			return `<div id="${this.id}" class="alien" style="height:${this.height}px; width: ${this.width}px; top: ${this.y}px;left: ${this.x}px;"><img src="${this.sprite}" class="alien-img"></div>`;
 		}
 
 		changeImage(sprite) {
