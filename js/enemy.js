@@ -8,6 +8,7 @@ class Enemy {
 		this.sprite = sprite;
 		this.element = null;
 		this.imageElement = null;
+		this.isUsingTemporarySprite = false;
 	}
 
 	buildElement() {
@@ -36,6 +37,20 @@ class Enemy {
 		this.imageElement.src = this.sprite;
 	}
 
+	showTemporaryImage(sprite) {
+		this.isUsingTemporarySprite = true;
+		this.imageElement.src = sprite;
+	}
+
+	resumeAnimation(sprite) {
+		this.isUsingTemporarySprite = false;
+		this.changeImage(sprite);
+	}
+
+	shouldQueueLaser(loopMs, averageMs) {
+		return !this.isUsingTemporarySprite && Math.random() < loopMs / averageMs;
+	}
+
 	move(xMove, yMove) {
 		//Move the enemy by the provided coordinates
 		this.x += xMove;
@@ -49,6 +64,8 @@ class Enemy {
 	die() {
 		//Get rid of the enemy from the document
 		this.element.remove();
+		this.element = null;
+		this.imageElement = null;
 	}
 }
 

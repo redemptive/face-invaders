@@ -1,5 +1,5 @@
 class Laser {
-	constructor(x, y, ySpeed, height, width, id, className) {
+	constructor(x, y, ySpeed, height, width, id, className, sprite) {
 		this.x = x;
 		this.y = y;
 		this.height = height;
@@ -7,6 +7,7 @@ class Laser {
 		this.id = id;
 		this.ySpeed = ySpeed;
 		this.className = className;
+		this.sprite = sprite;
 		this.element = null;
 	}
 
@@ -27,6 +28,14 @@ class Laser {
 			top: this.y + "px",
 			left: this.x + "px"
 		});
+
+		if (this.sprite) {
+			const image = document.createElement("img");
+			image.src = this.sprite;
+			image.width = this.width;
+			image.height = this.height;
+			this.element.appendChild(image);
+		}
 
 		return this.element;
 	}

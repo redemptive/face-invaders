@@ -1,15 +1,13 @@
 class Game {
-	constructor(player, playerLaser, enemies, enemyLaser, enemySprites, enemyNumber, enemiesPerRow, enemyDirection, enemyFireCounter, enemyFireCooldown, animateCounter, animateIndex, animateSpeed, endGame, keyMap, score) {
+	constructor(player, playerLaser, enemies, enemyLasers, enemySprites, enemyNumber, enemiesPerRow, enemyDirection, animateCounter, animateIndex, animateSpeed, endGame, keyMap, score) {
 		this.player = player;
 		this.playerLaser = playerLaser;
 		this.enemies = enemies;
-		this.enemyLaser = enemyLaser;
+		this.enemyLasers = enemyLasers;
 		this.enemySprites = enemySprites;
 		this.enemyNumber = enemyNumber;
 		this.enemiesPerRow = enemiesPerRow;
 		this.enemyDirection = enemyDirection;
-		this.enemyFireCounter = enemyFireCounter;
-		this.enemyFireCooldown = enemyFireCooldown;
 		this.animateCounter = animateCounter;
 		this.animateIndex = this.enemySprites.length ? animateIndex % this.enemySprites.length : 0;
 		this.animateSpeed = animateSpeed;
@@ -90,7 +88,8 @@ class Game {
 				config.playerLaser.height,
 				config.playerLaser.width,
 				config.playerLaser.id,
-				config.playerLaser.className
+				config.playerLaser.className,
+				config.playerLaser.sprite
 			);
 			window.gameDom.appendElement(this.playerLaser.buildElement());
 		}
@@ -115,11 +114,11 @@ class Game {
 				this.playerLaser = "";
 			}
 		}
-		if (this.enemyLaser !== "") {
-			this.enemyLaser.move();
-			if (this.enemyLaser.y > window.innerHeight) {
-				this.enemyLaser.die();
-				this.enemyLaser = "";
+		for (let i = this.enemyLasers.length - 1; i >= 0; i--) {
+			this.enemyLasers[i].move();
+			if (this.enemyLasers[i].y > window.innerHeight) {
+				this.enemyLasers[i].die();
+				this.enemyLasers.splice(i, 1);
 			}
 		}
 	}
@@ -155,7 +154,7 @@ class Game {
 		//Loop through all enemies
 		for (let i = 0; i < this.enemies.length; i++) {
 			//Change the enemy sprites for animation if it is time
-			if (this.enemySprites[this.animateIndex] !== this.enemies[i].sprite) {
+			if (!this.enemies[i].isUsingTemporarySprite && this.enemySprites[this.animateIndex] !== this.enemies[i].sprite) {
 				this.enemies[i].changeImage(this.enemySprites[this.animateIndex]);
 			}
 			//Move the enemies based on the current direction
@@ -176,27 +175,72 @@ class Game {
 				}
 			}
 		}
-		//Make a random enemy shoot a laser if it is time
-		if (this.enemyFireCooldown < this.enemyFireCounter && this.enemyLaser === "") {
-			const randomEnemy = Math.floor(Math.random() * this.enemies.length);
-			this.enemyLaser = new window.Laser(
-				this.enemies[randomEnemy].x,
-				this.enemies[randomEnemy].y,
+		this.queueRandomEnemyLaser();
+		//Spawn more enemies if there is none left
+		if (this.enemies.length < 1) {
+			this.spawnEnemies();
+		}
+	}
+
+	queueRandomEnemyLaser() {
+		const config = window.gameConfig;
+
+		if (this.enemies.length < 1) {
+			return;
+		}
+
+		for (let i = 0; i < this.enemies.length; i++) {
+			if (this.enemies[i].shouldQueueLaser(config.game.loopMs, config.enemies.fireAverageMs)) {
+				this.queueEnemyLaser(this.enemies[i]);
+			}
+		}
+	}
+
+	queueEnemyLaser(enemy) {
+		const config = window.gameConfig;
+
+		enemy.showTemporaryImage(config.enemyLaser.warningSprite);
+
+		setTimeout(() => {
+			if (this.endGame || !this.enemies.includes(enemy) || !enemy.element) {
+				return;
+			}
+
+			const enemyLaser = new window.Laser(
+				enemy.x,
+				enemy.y,
 				config.enemyLaser.speedBase + this.score,
 				config.enemyLaser.height,
 				config.enemyLaser.width,
 				config.enemyLaser.id,
-				config.enemyLaser.className
+				config.enemyLaser.className,
+				config.enemyLaser.sprite
 			);
-			window.gameDom.appendElement(this.enemyLaser.buildElement());
-			this.enemyFireCounter = 0;
-		} else {
-			this.enemyFireCounter++;
-			this.enemyFireCooldown = config.enemies.fireCooldown - (this.score * config.enemies.fireCooldownScoreMultiplier);
-		}
-		//Spawn more enemies if there is none left
-		if (this.enemies.length < 1) {
-			this.spawnEnemies();
+			this.enemyLasers.push(enemyLaser);
+			window.gameDom.appendElement(enemyLaser.buildElement());
+			enemy.showTemporaryImage(config.enemyLaser.firedSprite);
+
+			setTimeout(() => {
+				if (!this.endGame && this.enemies.includes(enemy) && enemy.element) {
+					enemy.resumeAnimation(this.enemySprites[this.animateIndex]);
+				}
+			}, config.enemyLaser.recoveryMs);
+		}, config.enemyLaser.warningMs);
+	}
+
+	checkEnemyLaserHits() {
+		for (let i = this.enemyLasers.length - 1; i >= 0; i--) {
+			if (this.collision(this.player.x, this.player.y, this.player.width, this.player.height, this.enemyLasers[i].x, this.enemyLasers[i].y, this.enemyLasers[i].width, this.enemyLasers[i].height)) {
+				this.enemyLasers[i].die();
+				this.enemyLasers.splice(i, 1);
+				this.player.lives --;
+				this.updateHud();
+				this.player.changeSprite();
+				if (this.player.lives < 1) {
+					this.endGame = true;
+					return;
+				}
+			}
 		}
 	}
 
@@ -207,18 +251,7 @@ class Game {
 			this.manageLasers();
 			this.checkKeys();
 			this.manageEnemies();
-			if (this.enemyLaser !== "") {
-				if (this.collision(this.player.x, this.player.y, this.player.width, this.player.height, this.enemyLaser.x, this.enemyLaser.y, this.enemyLaser.width, this.enemyLaser.height)) {
-					this.enemyLaser.die();
-					this.enemyLaser = "";
-					this.player.lives --;
-					this.updateHud();
-					this.player.changeSprite();
-					if (this.player.lives < 1) {
-						this.endGame = true;
-					}
-				}
-			}
+			this.checkEnemyLaserHits();
 			//End game if the enemies reach the bottom of the screen
 			if (this.enemies[0].y > window.innerHeight - this.player.height - this.enemies[0].height) {
 				this.endGame = true;

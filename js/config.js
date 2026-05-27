@@ -41,9 +41,7 @@ window.gameConfig = {
 		moveStep: 5,
 		speedScoreDivisor: 2,
 		descentScoreDivisor: 40,
-		fireCounter: 0,
-		fireCooldown: 200,
-		fireCooldownScoreMultiplier: 4,
+		fireAverageMs: 5000,
 		sprites: [
 			"assets/smile.png",
 			"assets/grin.png",
@@ -53,9 +51,14 @@ window.gameConfig = {
 	enemyLaser: {
 		speedBase: 8,
 		height: 25,
-		width: 10,
+		width: 25,
 		id: 0,
-		className: "enemyLaser"
+		className: "enemyLaser",
+		sprite: "assets/microbe.png",
+		warningSprite: "assets/nauseated_face.png",
+		firedSprite: "assets/face_vomiting.png",
+		warningMs: 1000,
+		recoveryMs: 1000
 	},
 	animation: {
 		counter: 0,
