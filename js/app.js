@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
 	let game;
+	const config = window.gameConfig;
 
 	const appendHtml = (html) => document.body.insertAdjacentHTML("beforeend", html);
 	const setText = (selector, text) => {
@@ -40,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			//function calls
 			this.spawnAliens();
 			this.initScreen();
-			this.interval = setInterval(() => this.gameLoop(), 20);
+			this.interval = setInterval(() => this.gameLoop(), config.game.loopMs);
 		}
 
 		initScreen() {
@@ -52,8 +53,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		updateHud() {
 			//Update score and lives when they change
-			setText("#score", "Score: " + this.score);
-			setText("#lives", "Lives: " + this.player.lives);
+			setText("#score", `Score: ${this.score}`);
+			setText("#lives", `Lives: ${this.player.lives}`);
 		}
 
 		spawnAliens() {
@@ -61,9 +62,23 @@ document.addEventListener("DOMContentLoaded", () => {
 			this.alienNumber ++;
 			for (let i = 0; i <	this.alienNumber; i++) {
 				if (i < this.aliensPerRow) {
-					this.aliens[i] = new Alien(i*100, 0, i, 100, 100, this.alienSprites[this.animateIndex]);
+					this.aliens[i] = new Alien(
+						i * config.aliens.spacingX,
+						config.aliens.initialY,
+						i,
+						config.aliens.height,
+						config.aliens.width,
+						this.alienSprites[this.animateIndex]
+					);
 				} else {
-					this.aliens[i] = new Alien((i - 5)*100, 120, i, 100, 100, this.alienSprites[this.animateIndex]);
+					this.aliens[i] = new Alien(
+						(i - this.aliensPerRow) * config.aliens.spacingX,
+						config.aliens.spacingY,
+						i,
+						config.aliens.height,
+						config.aliens.width,
+						this.alienSprites[this.animateIndex]
+					);
 				}
 				appendHtml(this.aliens[i].buildHtml());
 			}
@@ -71,15 +86,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		checkKeys() {
 			//Check the keys and perform appropriate actions
-			//D key (right)
-			if (this.keyMap[68] && this.player.x < window.innerWidth - 10 - this.player.width) {
-				this.player.move(10,0);
-			} else if (this.keyMap[65] && this.player.x > 10) {
-				//A key (left)
-				this.player.move(-10,0);
-			} else if (this.keyMap[71] && this.playerLaser === "") {
-				//G key (fire)
-				this.playerLaser = new Laser(this.player.x, this.player.y, -10, 25, 10, 0, "bullet");
+			if (this.keyMap[config.controls.right] && this.player.x < window.innerWidth - config.player.screenPadding - this.player.width) {
+				this.player.move(config.player.moveStep, 0);
+			} else if (this.keyMap[config.controls.left] && this.player.x > config.player.screenPadding) {
+				this.player.move(-config.player.moveStep, 0);
+			} else if (this.keyMap[config.controls.fire] && this.playerLaser === "") {
+				this.playerLaser = new Laser(
+					this.player.x,
+					this.player.y,
+					config.playerLaser.speed,
+					config.playerLaser.height,
+					config.playerLaser.width,
+					config.playerLaser.id,
+					config.playerLaser.className
+				);
 				appendHtml(this.playerLaser.buildHtml());
 			}
 		}
@@ -97,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		manageLasers() {
 			//Remove the lasers when they leave the screen
 			if (this.playerLaser !== "") {
-				this.playerLaser.move(0,-10);
+				this.playerLaser.move();
 				if (this.playerLaser.y < 0) {
 					this.playerLaser.die();
 					this.playerLaser = "";
@@ -148,9 +168,9 @@ document.addEventListener("DOMContentLoaded", () => {
 				}
 				//Move the aliens based on the current direction
 				if (this.alienDirection === "right") {
-					this.aliens[i].move(5 + (this.score/2),this.score / 40);
+					this.aliens[i].move(config.aliens.moveStep + (this.score / config.aliens.speedScoreDivisor), this.score / config.aliens.descentScoreDivisor);
 				} else {
-					this.aliens[i].move(-5 - (this.score/2),this.score / 40);
+					this.aliens[i].move(-config.aliens.moveStep - (this.score / config.aliens.speedScoreDivisor), this.score / config.aliens.descentScoreDivisor);
 				}
 				//Check if the player has shot an alien
 				if (this.playerLaser !== "") {
@@ -167,12 +187,20 @@ document.addEventListener("DOMContentLoaded", () => {
 			//Make a random alien shoot a laser if it is time
 			if (this.alienFireCooldown < this.alienFireCounter && this.alienLaser === "") {
 				const randomAlien = Math.floor(Math.random() * this.aliens.length);
-				this.alienLaser = new Laser(this.aliens[randomAlien].x, this.aliens[randomAlien].y, 6 + this.score, 25, 10, 0, "alienLaser");
+				this.alienLaser = new Laser(
+					this.aliens[randomAlien].x,
+					this.aliens[randomAlien].y,
+					config.alienLaser.speedBase + this.score,
+					config.alienLaser.height,
+					config.alienLaser.width,
+					config.alienLaser.id,
+					config.alienLaser.className
+				);
 				appendHtml(this.alienLaser.buildHtml());
 				this.alienFireCounter = 0;
 			} else {
 				this.alienFireCounter++;
-				this.alienFireCooldown = 200 - (this.score * 4);
+				this.alienFireCooldown = config.aliens.fireCooldown - (this.score * config.aliens.fireCooldownScoreMultiplier);
 			}
 			//Spawn more aliens if there is none left
 			if (this.aliens.length < 1) {
@@ -312,18 +340,49 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	function init() {
 		//Create a new game object
-		game = new Game(new Player(20, window.innerHeight - 60, 50, 50, 3,["assets/player2.png","assets/player1.png","assets/player.png"]), "", [], "", ["assets/alien.png", "assets/alien1.png", "assets/alien2.png"], 0, 5,"right", 0, 200, 0, 0, 25, false, {68: false, 65: false, 71: false}, 0);
+		const player = new Player(
+			config.player.x,
+			window.innerHeight - config.player.bottomOffset,
+			config.player.height,
+			config.player.width,
+			config.player.lives,
+			config.player.sprites
+		);
+		const keyMap = {
+			[config.controls.left]: false,
+			[config.controls.right]: false,
+			[config.controls.fire]: false
+		};
+
+		game = new Game(
+			player,
+			"",
+			[],
+			"",
+			config.aliens.sprites,
+			config.aliens.initialNumber,
+			config.aliens.perRow,
+			config.aliens.direction,
+			config.aliens.fireCounter,
+			config.aliens.fireCooldown,
+			config.animation.counter,
+			config.animation.index,
+			config.animation.speed,
+			false,
+			keyMap,
+			config.game.initialScore
+		);
 	}
 
 	//Key handlers
 	document.addEventListener("keydown", (e) => {
-		if (e.keyCode in game.keyMap) {
-			game.keyMap[e.keyCode] = true;
+		if (e.code in game.keyMap) {
+			game.keyMap[e.code] = true;
 		}
 	});
 	document.addEventListener("keyup", (e) => {
-		if (e.keyCode in game.keyMap) {
-			game.keyMap[e.keyCode] = false;
+		if (e.code in game.keyMap) {
+			game.keyMap[e.code] = false;
 		}
 	});
 	init();
