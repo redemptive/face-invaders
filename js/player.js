@@ -20,7 +20,7 @@ class Player {
 
 	buildHtml() {
 		//Put together the required HTML for the player
-		return `<div id="player"><img id="playerImg" src="${this.sprites[this.lives - 1]}" width="${this.width}" height="${this.height}"></div>`;
+		return `<div id="player" style="top: ${this.y}px; left: ${this.x}px;"><img id="playerImg" src="${this.sprites[this.lives - 1]}" width="${this.width}" height="${this.height}"></div>`;
 	}
 
 	changeSprite() {

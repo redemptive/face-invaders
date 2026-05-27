@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		//Create a new game object
 		const player = new window.Player(
 			config.player.x,
-			window.innerHeight - config.player.bottomOffset,
+			window.innerHeight - config.player.bottomOffset - config.player.height,
 			config.player.height,
 			config.player.width,
 			config.player.lives,

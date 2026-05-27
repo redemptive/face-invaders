@@ -6,7 +6,7 @@ window.gameConfig = {
 	controls: {
 		left: "KeyA",
 		right: "KeyD",
-		fire: "KeyG"
+		fire: "Space"
 	},
 	player: {
 		x: 20,
@@ -23,7 +23,7 @@ window.gameConfig = {
 		]
 	},
 	playerLaser: {
-		speed: -10,
+		speed: -15,
 		height: 25,
 		width: 10,
 		id: 0,
@@ -51,7 +51,7 @@ window.gameConfig = {
 		]
 	},
 	enemyLaser: {
-		speedBase: 6,
+		speedBase: 8,
 		height: 25,
 		width: 10,
 		id: 0,

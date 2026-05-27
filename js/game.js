@@ -11,7 +11,7 @@ class Game {
 		this.enemyFireCounter = enemyFireCounter;
 		this.enemyFireCooldown = enemyFireCooldown;
 		this.animateCounter = animateCounter;
-		this.animateIndex = animateIndex;
+		this.animateIndex = this.enemySprites.length ? animateIndex % this.enemySprites.length : 0;
 		this.animateSpeed = animateSpeed;
 		this.endGame = endGame;
 		this.keyMap = keyMap;
@@ -136,10 +136,8 @@ class Game {
 		//Manage the animate counter for animating the enemies by changing sprites
 		if (this.animateCounter > this.animateSpeed) {
 			this.animateCounter = 0;
-			if (this.animateIndex < this.enemySprites.length) {
-				this.animateIndex ++;
-			} else {
-				this.animateIndex = 0;
+			if (this.enemySprites.length > 0) {
+				this.animateIndex = (this.animateIndex + 1) % this.enemySprites.length;
 			}
 		} else {
 			this.animateCounter ++;

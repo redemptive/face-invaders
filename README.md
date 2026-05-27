@@ -16,6 +16,6 @@ Either clone the repository and open start.html to play or go to http://redempti
 ### Controls and Gameplay
 - A key, move left
 - D key, move right
-- G key, fire laser
+- Space key, fire laser
 
 Avoid the enemy lasers and shoot all the enemies before they reach the bottom of the screen.
