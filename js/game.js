@@ -17,6 +17,10 @@ class Game {
 		this.scoreElement = null;
 		this.livesElement = null;
 		this.nextPlayerFireAt = 0;
+		this.fastFirePickup = null;
+		this.fastMovePickup = null;
+		this.fastFireUntil = 0;
+		this.fastMoveUntil = 0;
 		//function calls
 		this.spawnEnemies();
 		this.initScreen();
@@ -75,12 +79,13 @@ class Game {
 
 	checkKeys() {
 		const config = window.gameConfig;
+		const moveStep = this.getPlayerMoveStep();
 
 		//Check the keys and perform appropriate actions
 		if (this.keyMap[config.controls.right] && this.player.x < window.innerWidth - config.player.screenPadding - this.player.width) {
-			this.player.move(config.player.moveStep, 0);
+			this.player.move(moveStep, 0);
 		} else if (this.keyMap[config.controls.left] && this.player.x > config.player.screenPadding) {
-			this.player.move(-config.player.moveStep, 0);
+			this.player.move(-moveStep, 0);
 		}
 
 		if (this.keyMap[config.controls.fire] && Date.now() >= this.nextPlayerFireAt) {
@@ -96,8 +101,18 @@ class Game {
 			);
 			this.playerLasers.push(playerLaser);
 			window.gameDom.appendElement(playerLaser.buildElement());
-			this.nextPlayerFireAt = Date.now() + config.playerLaser.cooldownMs;
+			this.nextPlayerFireAt = Date.now() + this.getPlayerLaserCooldown();
 		}
+	}
+
+	getPlayerLaserCooldown() {
+		const config = window.gameConfig;
+		return Date.now() < this.fastFireUntil ? config.playerLaser.cooldownMs / 2 : config.playerLaser.cooldownMs;
+	}
+
+	getPlayerMoveStep() {
+		const config = window.gameConfig;
+		return Date.now() < this.fastMoveUntil ? config.player.moveStep * 2 : config.player.moveStep;
 	}
 
 	collision(x1,y1,w1,h1,x2,y2,w2,h2) {
@@ -126,6 +141,61 @@ class Game {
 				this.enemyLasers.splice(i, 1);
 			}
 		}
+	}
+
+	managePickups() {
+		const config = window.gameConfig;
+
+		this.managePickup("fastFirePickup", window.FastFirePickup, config.fastFirePickup, () => {
+			const now = Date.now();
+			this.fastFireUntil = now + config.fastFirePickup.effectMs;
+			this.nextPlayerFireAt = Math.min(this.nextPlayerFireAt, now + this.getPlayerLaserCooldown());
+		});
+		this.managePickup("fastMovePickup", window.FastMovePickup, config.fastMovePickup, () => {
+			this.fastMoveUntil = Date.now() + config.fastMovePickup.effectMs;
+		});
+	}
+
+	managePickup(pickupName, PickupClass, pickupConfig, collectPickup) {
+		if (!this[pickupName]) {
+			this.maybeSpawnPickup(pickupName, PickupClass, pickupConfig);
+			return;
+		}
+
+		const pickup = this[pickupName];
+		pickup.move();
+		if (this.collision(this.player.x, this.player.y, this.player.width, this.player.height, pickup.x, pickup.y, pickup.width, pickup.height)) {
+			pickup.die();
+			this[pickupName] = null;
+			collectPickup();
+			return;
+		}
+
+		if (pickup.y > window.innerHeight) {
+			pickup.die();
+			this[pickupName] = null;
+		}
+	}
+
+	maybeSpawnPickup(pickupName, PickupClass, pickupConfig) {
+		const config = window.gameConfig;
+		const spawnChance = config.game.loopMs / pickupConfig.spawnAverageMs;
+
+		if (Math.random() >= spawnChance) {
+			return;
+		}
+
+		const x = Math.random() * Math.max(0, window.innerWidth - pickupConfig.width);
+		this[pickupName] = new PickupClass(
+			x,
+			0,
+			pickupConfig.speed,
+			pickupConfig.height,
+			pickupConfig.width,
+			pickupConfig.sprite,
+			pickupConfig.className
+		);
+		window.gameDom.appendElement(this[pickupName].buildElement());
 	}
 
 	manageEnemies() {
@@ -256,6 +326,7 @@ class Game {
 		if (!this.endGame) {
 			this.manageLasers();
 			this.checkKeys();
+			this.managePickups();
 			this.manageEnemies();
 			this.checkEnemyLaserHits();
 			//End game if the enemies reach the bottom of the screen

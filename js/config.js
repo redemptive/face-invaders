@@ -31,6 +31,24 @@ window.gameConfig = {
 		sprite: "assets/middle_finger.png",
 		cooldownMs: 1000
 	},
+	fastFirePickup: {
+		spawnAverageMs: 30000,
+		effectMs: 10000,
+		sprite: "assets/zap.png",
+		height: 40,
+		width: 40,
+		speed: 2,
+		className: "fastFirePickup"
+	},
+	fastMovePickup: {
+		spawnAverageMs: 30000,
+		effectMs: 10000,
+		sprite: "assets/athletic_shoe.png",
+		height: 40,
+		width: 40,
+		speed: 2,
+		className: "fastMovePickup"
+	},
 	enemies: {
 		initialNumber: 0,
 		perRow: 5,
