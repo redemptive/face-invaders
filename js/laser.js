@@ -14,7 +14,7 @@ class Laser {
 	move() {
 		//Function for moving the laser based on it's ySpeed
 		this.y += this.ySpeed;
-		this.element.style.top = this.y + "px";
+		this.updatePosition();
 	}
 
 	buildElement() {
@@ -24,10 +24,9 @@ class Laser {
 		this.element.className = this.className;
 		Object.assign(this.element.style, {
 			height: this.height + "px",
-			width: this.width + "px",
-			top: this.y + "px",
-			left: this.x + "px"
+			width: this.width + "px"
 		});
+		this.updatePosition();
 
 		if (this.sprite) {
 			const image = document.createElement("img");
@@ -38,6 +37,10 @@ class Laser {
 		}
 
 		return this.element;
+	}
+
+	updatePosition() {
+		this.element.style.transform = `translate(${this.x}px, ${this.y}px)`;
 	}
 
 	die() {

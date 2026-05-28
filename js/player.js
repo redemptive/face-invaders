@@ -14,20 +14,14 @@ class Player {
 		//Function for moving the player
 		this.x += xMove;
 		this.y += yMove;
-		Object.assign(this.element.style, {
-			top: this.y + "px",
-			left: this.x + "px"
-		});
+		this.updatePosition();
 	}
 
 	buildElement() {
 		//Put together the required DOM for the player
 		this.element = document.createElement("div");
 		this.element.id = "player";
-		Object.assign(this.element.style, {
-			top: this.y + "px",
-			left: this.x + "px"
-		});
+		this.updatePosition();
 
 		this.imageElement = document.createElement("img");
 		this.imageElement.id = "playerImg";
@@ -37,6 +31,10 @@ class Player {
 		this.element.appendChild(this.imageElement);
 
 		return this.element;
+	}
+
+	updatePosition() {
+		this.element.style.transform = `translate(${this.x}px, ${this.y}px)`;
 	}
 
 	changeSprite() {

@@ -9,6 +9,7 @@
 	position: absolute;
 	top: 0px;
 	left: 0px;
+	will-change: transform;
 }
 
 .bullet img {
@@ -20,6 +21,7 @@
 	position: absolute;
 	top: 0px;
 	left: 0px;
+	will-change: transform;
 }
 
 .enemyLaser img {
@@ -37,6 +39,9 @@
 	height: 50px;
 	width: 50px;
 	position: absolute;
+	top: 0px;
+	left: 0px;
+	will-change: transform;
 }
 
 body {
@@ -46,6 +51,9 @@ body {
 
 .enemy {
 	position: fixed;
+	top: 0px;
+	left: 0px;
+	will-change: transform;
 }
 
 #score {

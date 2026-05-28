@@ -18,10 +18,9 @@ class Enemy {
 		this.element.className = "enemy";
 		Object.assign(this.element.style, {
 			height: this.height + "px",
-			width: this.width + "px",
-			top: this.y + "px",
-			left: this.x + "px"
+			width: this.width + "px"
 		});
+		this.updatePosition();
 
 		this.imageElement = document.createElement("img");
 		this.imageElement.src = this.sprite;
@@ -55,10 +54,11 @@ class Enemy {
 		//Move the enemy by the provided coordinates
 		this.x += xMove;
 		this.y += yMove;
-		Object.assign(this.element.style, {
-			top: this.y + "px",
-			left: this.x + "px"
-		});
+		this.updatePosition();
+	}
+
+	updatePosition() {
+		this.element.style.transform = `translate(${this.x}px, ${this.y}px)`;
 	}
 
 	die() {
