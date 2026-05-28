@@ -25,9 +25,11 @@ window.gameConfig = {
 	playerLaser: {
 		speed: -15,
 		height: 25,
-		width: 10,
+		width: 25,
 		id: 0,
-		className: "bullet"
+		className: "bullet",
+		sprite: "assets/middle_finger.png",
+		cooldownMs: 1000
 	},
 	enemies: {
 		initialNumber: 0,

@@ -20,7 +20,7 @@ class Laser {
 	buildElement() {
 		//Build required DOM for the laser
 		this.element = document.createElement("div");
-		this.element.id = this.id;
+		this.element.id = `${this.className}-${Laser.nextId++}`;
 		this.element.className = this.className;
 		Object.assign(this.element.style, {
 			height: this.height + "px",
@@ -46,4 +46,5 @@ class Laser {
 	}
 }
 
+Laser.nextId = 0;
 window.Laser = Laser;

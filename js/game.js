@@ -1,7 +1,7 @@
 class Game {
-	constructor(player, playerLaser, enemies, enemyLasers, enemySprites, enemyNumber, enemiesPerRow, enemyDirection, animateCounter, animateIndex, animateSpeed, endGame, keyMap, score) {
+	constructor(player, playerLasers, enemies, enemyLasers, enemySprites, enemyNumber, enemiesPerRow, enemyDirection, animateCounter, animateIndex, animateSpeed, endGame, keyMap, score) {
 		this.player = player;
-		this.playerLaser = playerLaser;
+		this.playerLasers = playerLasers;
 		this.enemies = enemies;
 		this.enemyLasers = enemyLasers;
 		this.enemySprites = enemySprites;
@@ -16,6 +16,7 @@ class Game {
 		this.score = score;
 		this.scoreElement = null;
 		this.livesElement = null;
+		this.nextPlayerFireAt = 0;
 		//function calls
 		this.spawnEnemies();
 		this.initScreen();
@@ -80,8 +81,10 @@ class Game {
 			this.player.move(config.player.moveStep, 0);
 		} else if (this.keyMap[config.controls.left] && this.player.x > config.player.screenPadding) {
 			this.player.move(-config.player.moveStep, 0);
-		} else if (this.keyMap[config.controls.fire] && this.playerLaser === "") {
-			this.playerLaser = new window.Laser(
+		}
+
+		if (this.keyMap[config.controls.fire] && Date.now() >= this.nextPlayerFireAt) {
+			const playerLaser = new window.Laser(
 				this.player.x,
 				this.player.y,
 				config.playerLaser.speed,
@@ -91,7 +94,9 @@ class Game {
 				config.playerLaser.className,
 				config.playerLaser.sprite
 			);
-			window.gameDom.appendElement(this.playerLaser.buildElement());
+			this.playerLasers.push(playerLaser);
+			window.gameDom.appendElement(playerLaser.buildElement());
+			this.nextPlayerFireAt = Date.now() + config.playerLaser.cooldownMs;
 		}
 	}
 
@@ -107,11 +112,11 @@ class Game {
 
 	manageLasers() {
 		//Remove the lasers when they leave the screen
-		if (this.playerLaser !== "") {
-			this.playerLaser.move();
-			if (this.playerLaser.y < 0) {
-				this.playerLaser.die();
-				this.playerLaser = "";
+		for (let i = this.playerLasers.length - 1; i >= 0; i--) {
+			this.playerLasers[i].move();
+			if (this.playerLasers[i].y < 0) {
+				this.playerLasers[i].die();
+				this.playerLasers.splice(i, 1);
 			}
 		}
 		for (let i = this.enemyLasers.length - 1; i >= 0; i--) {
@@ -152,7 +157,7 @@ class Game {
 			this.animateCounter ++;
 		}
 		//Loop through all enemies
-		for (let i = 0; i < this.enemies.length; i++) {
+		for (let i = this.enemies.length - 1; i >= 0; i--) {
 			//Change the enemy sprites for animation if it is time
 			if (!this.enemies[i].isUsingTemporarySprite && this.enemySprites[this.animateIndex] !== this.enemies[i].sprite) {
 				this.enemies[i].changeImage(this.enemySprites[this.animateIndex]);
@@ -164,14 +169,15 @@ class Game {
 				this.enemies[i].move(-config.enemies.moveStep - (this.score / config.enemies.speedScoreDivisor), this.score / config.enemies.descentScoreDivisor);
 			}
 			//Check if the player has shot an enemy
-			if (this.playerLaser !== "") {
-				if (this.collision(this.enemies[i].x, this.enemies[i].y, this.enemies[i].width, this.enemies[i].height,this.playerLaser.x, this.playerLaser.y, this.playerLaser.width, this.playerLaser.height)) {
+			for (let laserIndex = this.playerLasers.length - 1; laserIndex >= 0; laserIndex--) {
+				if (this.collision(this.enemies[i].x, this.enemies[i].y, this.enemies[i].width, this.enemies[i].height, this.playerLasers[laserIndex].x, this.playerLasers[laserIndex].y, this.playerLasers[laserIndex].width, this.playerLasers[laserIndex].height)) {
 					this.score ++;
 					this.updateHud();
 					this.enemies[i].die();
-					this.enemies.splice(this.enemies.indexOf(this.enemies[i]),1);
-					this.playerLaser.die();
-					this.playerLaser = "";
+					this.enemies.splice(i, 1);
+					this.playerLasers[laserIndex].die();
+					this.playerLasers.splice(laserIndex, 1);
+					break;
 				}
 			}
 		}

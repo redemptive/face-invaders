@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		game = new window.Game(
 			player,
-			"",
+			[],
 			[],
 			[],
 			config.enemies.sprites,
