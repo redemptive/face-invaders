@@ -23,6 +23,8 @@ document.addEventListener("DOMContentLoaded", () => {
 		config.enemies.spacingX *= scale;
 		config.enemies.spacingY *= scale;
 		config.enemies.moveStep *= scale;
+		config.playerLaser.speed *= scale;
+		config.enemyLaser.speedBase *= scale;
 		config.game.isMobileSized = true;
 	}
 

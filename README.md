@@ -3,7 +3,7 @@
 # face-invaders
 
 ## Description
-A simple browser based space invaders game. Designed to just be pure HTML, CSS and JavaScript.
+A simple browser based space invaders game. Designed to just be pure HTML, CSS and JavaScript using plain dom elements without a canvas.
 
 ## Technologies
 - HTML5

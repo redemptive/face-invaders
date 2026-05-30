@@ -99,6 +99,28 @@ body {
 		user-select: none;
 	}
 
+	#score,
+	#lives {
+		background: rgba(0, 0, 0, 0.55);
+		font-size: 16px;
+		left: 10px;
+		left: max(10px, env(safe-area-inset-left));
+		line-height: 20px;
+		padding: 2px 6px;
+		position: fixed;
+		z-index: 30;
+	}
+
+	#score {
+		top: 12px;
+		top: max(12px, env(safe-area-inset-top));
+	}
+
+	#lives {
+		top: 36px;
+		top: calc(max(12px, env(safe-area-inset-top)) + 24px);
+	}
+
 	#touchControls {
 		align-items: center;
 		bottom: 16px;
