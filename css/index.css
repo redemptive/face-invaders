@@ -80,7 +80,67 @@ body {
 	font-family: "Courier New";
 }
 
+#touchControls {
+	display: none;
+}
+
 @keyframes backgroundScroll {
     from {background-position: 0 0;}
     to {background-position: 0px -800px;}
+}
+
+@media (hover: none) and (pointer: coarse) {
+	body {
+		margin: 0;
+		min-height: 100vh;
+		overflow: hidden;
+		touch-action: none;
+		-webkit-user-select: none;
+		user-select: none;
+	}
+
+	#touchControls {
+		align-items: center;
+		bottom: 16px;
+		bottom: max(16px, env(safe-area-inset-bottom));
+		display: grid;
+		gap: 14px;
+		grid-template-columns: 1fr 1.15fr 1fr;
+		left: 0;
+		margin: 0 auto;
+		max-width: 520px;
+		padding: 0 18px;
+		position: fixed;
+		right: 0;
+		z-index: 20;
+	}
+
+	.touchControl {
+		appearance: none;
+		background: rgba(0, 0, 0, 0.78);
+		border: 2px solid #00FF00;
+		border-radius: 8px;
+		color: #FFFFFF;
+		font-family: "Courier New";
+		font-size: 16px;
+		font-weight: bold;
+		height: 68px;
+		letter-spacing: 0;
+		touch-action: none;
+	}
+
+	.touchControlFire {
+		background: rgba(80, 0, 0, 0.86);
+		border-color: #FF4040;
+		height: 78px;
+	}
+
+	.touchControl:active {
+		background: #00AA00;
+		color: #000000;
+	}
+
+	.touchControlFire:active {
+		background: #FF4040;
+	}
 }

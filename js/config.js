@@ -16,6 +16,7 @@ window.gameConfig = {
 		lives: 3,
 		moveStep: 10,
 		screenPadding: 10,
+		mobileBottomOffset: 130,
 		sprites: [
 			"assets/skull.png",
 			"assets/imp.png",
