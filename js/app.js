@@ -7,7 +7,30 @@ document.addEventListener("DOMContentLoaded", () => {
 		return touchControlsQuery.matches;
 	}
 
+	function applyMobileSizing() {
+		if (config.game.isMobileSized) {
+			return;
+		}
+
+		const scale = config.game.mobileScale;
+		config.player.x *= scale;
+		config.player.height *= scale;
+		config.player.width *= scale;
+		config.player.moveStep *= scale;
+		config.player.screenPadding *= scale;
+		config.enemies.height *= scale;
+		config.enemies.width *= scale;
+		config.enemies.spacingX *= scale;
+		config.enemies.spacingY *= scale;
+		config.enemies.moveStep *= scale;
+		config.game.isMobileSized = true;
+	}
+
 	function init() {
+		if (isTouchControlsEnabled()) {
+			applyMobileSizing();
+		}
+
 		const playerBottomOffset = isTouchControlsEnabled() ? config.player.mobileBottomOffset : config.player.bottomOffset;
 
 		//Create a new game object
@@ -70,24 +93,32 @@ document.addEventListener("DOMContentLoaded", () => {
 		button.textContent = label;
 		button.setAttribute("aria-label", label);
 
-		button.addEventListener("pointerdown", (e) => {
+		function pressButton(e) {
 			e.preventDefault();
-			button.setPointerCapture(e.pointerId);
 			game.keyMap[keyCode] = true;
+		}
+
+		function releaseButton(e) {
+			if (e) {
+				e.preventDefault();
+			}
+			game.keyMap[keyCode] = false;
+		}
+
+		button.addEventListener("pointerdown", (e) => {
+			if (button.setPointerCapture) {
+				button.setPointerCapture(e.pointerId);
+			}
+			pressButton(e);
 		});
 
-		button.addEventListener("pointerup", (e) => {
-			e.preventDefault();
-			game.keyMap[keyCode] = false;
-		});
-
-		button.addEventListener("pointercancel", () => {
-			game.keyMap[keyCode] = false;
-		});
-
-		button.addEventListener("lostpointercapture", () => {
-			game.keyMap[keyCode] = false;
-		});
+		button.addEventListener("pointerup", releaseButton);
+		button.addEventListener("pointercancel", releaseButton);
+		button.addEventListener("lostpointercapture", releaseButton);
+		button.addEventListener("touchstart", pressButton, { passive: false });
+		button.addEventListener("touchend", releaseButton, { passive: false });
+		button.addEventListener("touchcancel", releaseButton, { passive: false });
+		button.addEventListener("contextmenu", (e) => e.preventDefault());
 
 		controls.appendChild(button);
 	}

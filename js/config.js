@@ -1,7 +1,8 @@
 window.gameConfig = {
 	game: {
 		loopMs: 20,
-		initialScore: 0
+		initialScore: 0,
+		mobileScale: 0.5
 	},
 	controls: {
 		left: "KeyA",

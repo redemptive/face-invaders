@@ -21,6 +21,10 @@ class Player {
 		//Put together the required DOM for the player
 		this.element = document.createElement("div");
 		this.element.id = "player";
+		Object.assign(this.element.style, {
+			height: this.height + "px",
+			width: this.width + "px"
+		});
 		this.updatePosition();
 
 		this.imageElement = document.createElement("img");

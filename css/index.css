@@ -127,6 +127,10 @@ body {
 		height: 68px;
 		letter-spacing: 0;
 		touch-action: none;
+		-webkit-tap-highlight-color: transparent;
+		-webkit-touch-callout: none;
+		-webkit-user-select: none;
+		user-select: none;
 	}
 
 	.touchControlFire {
